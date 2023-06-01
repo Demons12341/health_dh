@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dh.mapper.OrdersettingMapper">
+
+    <resultMap id="BaseResultMap" type="com.dh.pojo.Ordersetting">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="orderdate" column="orderDate" jdbcType="DATE"/>
+            <result property="number" column="number" jdbcType="INTEGER"/>
+            <result property="reservations" column="reservations" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,orderDate,number,
+        reservations
+    </sql>
+
+
+    <select id="findCountByOrderDate" parameterType="java.util.Date" resultType="long">
+        select count(*) from t_ordersetting where orderDate = #{orderDate}
+    </select>
+    <select id="selectByData" resultType="com.dh.pojo.Ordersetting">
+        SELECT * FROM t_ordersetting
+        WHERE DATE_FORMAT(orderDate, '%Y-%m') = #{data};
+
+
+    </select>
+
+
+    <select id="findByOrderdate" resultType="com.dh.pojo.Ordersetting">
+
+    </select>
+
+
+    <update id="updateNumberByOrderdate">
+update t_ordersetting
+ set number = #{number,jdbcType=NUMERIC}
+where
+orderDate = #{orderdate,jdbcType=TIMESTAMP}
+</update>
+
+
+</mapper>

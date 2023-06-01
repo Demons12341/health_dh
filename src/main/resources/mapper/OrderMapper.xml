@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dh.mapper.OrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.dh.pojo.Order">
+        <id property="id" column="id" jdbcType="INTEGER"/>
+        <result property="memberId" column="member_id" jdbcType="INTEGER"/>
+        <result property="orderdate" column="orderDate" jdbcType="DATE"/>
+        <result property="ordertype" column="orderType" jdbcType="VARCHAR"/>
+        <result property="orderstatus" column="orderStatus" jdbcType="VARCHAR"/>
+        <result property="setmealId" column="setmeal_id" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,member_id,orderDate,
+        orderType,orderStatus,setmeal_id
+    </sql>
+    <select id="findById4Detail"   parameterType="int" resultType="map">
+
+         select m.name 'member' ,s.name 'setmeal',o.orderDate 'orderDate',o.orderType 'orderType'
+          from
+          t_order o,
+          t_member m,
+          t_setmeal s
+          where o.member_id=m.id and o.setmeal_id=s.id and o.id=#{id}
+    </select>
+    <select id="countByOrderdate" resultType="int">
+select count(*)
+ from t_order
+where
+orderDate = #{orderdate}
+</select>
+    <select id="countByOrderdateBetween" resultType="int">
+select count(*)
+ from t_order
+where
+orderDate between #{beginOrderdate,jdbcType=TIMESTAMP} and #{endOrderdate,jdbcType=TIMESTAMP}
+</select>
+    <select id="countByOrderdateBetweenAndOrderstatus" resultType="int">
+select count(*)
+ from t_order
+where
+orderDate between #{beginOrderdate,jdbcType=TIMESTAMP} and #{endOrderdate,jdbcType=TIMESTAMP}
+ AND orderStatus = #{orderstatus,jdbcType=VARCHAR}
+</select>
+    <select id="countByOrderdateAndOrderstatus" resultType="int">
+select count(*)
+ from t_order
+where
+orderDate = #{orderdate,jdbcType=TIMESTAMP}
+ AND orderStatus = #{orderstatus,jdbcType=VARCHAR}
+</select>
+    <select id="findHotSetmeal" resultType="java.util.Map">
+         select s.name,
+         count(o.id) setmeal_count ,
+         count(o.id)/(select count(id) from t_order) proportion
+    from t_order o inner join t_setmeal s on s.id = o.setmeal_id
+    group by o.setmeal_id
+    order by setmeal_count desc
+  	limit 0,4
+    </select>
+    <select id="selectByCondition" resultType="com.dh.pojo.Order">
+        SELECT * FROM t_order
+        <if test="value != null and value.length > 0">
+            WHERE fileNumber LIKE CONCAT('%', #{value}, '%')
+            OR phoneNumber LIKE CONCAT('%', #{value}, '%')
+            OR name LIKE CONCAT('%', #{value}, '%')
+        </if>
+    </select>
+    <update id="updateOrderstatusById">
+update t_order
+ set orderStatus = #{orderstatus,jdbcType=VARCHAR}
+where
+id = #{id,jdbcType=NUMERIC}
+</update>
+</mapper>

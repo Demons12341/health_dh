@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dh.mapper.MemberMapper">
+
+    <resultMap id="BaseResultMap" type="com.dh.pojo.Member">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="filenumber" column="fileNumber" jdbcType="VARCHAR"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="sex" column="sex" jdbcType="VARCHAR"/>
+            <result property="idcard" column="idCard" jdbcType="VARCHAR"/>
+            <result property="phonenumber" column="phoneNumber" jdbcType="VARCHAR"/>
+            <result property="regtime" column="regTime" jdbcType="DATE"/>
+            <result property="password" column="password" jdbcType="VARCHAR"/>
+            <result property="email" column="email" jdbcType="VARCHAR"/>
+            <result property="birthday" column="birthday" jdbcType="DATE"/>
+            <result property="remark" column="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,fileNumber,name,
+        sex,idCard,phoneNumber,
+        regTime,password,email,
+        birthday,remark
+    </sql>
+    <select id="selectByPhonenumber" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_member
+        where
+        phoneNumber = #{phonenumber,jdbcType=VARCHAR}
+    </select>
+    <select id="countByRegtime" resultType="int">
+select count(*)
+ from t_member
+where
+regTime = #{regtime}
+</select>
+    <select id="findMemberCountThisWeek" resultType="java.lang.Integer">
+        SELECT COUNT(id)
+        FROM t_member
+        WHERE WEEK(regTime) = WEEK(NOW());
+    </select>
+    <select id="findMemberCountThisMonth" resultType="java.lang.Integer">
+         SELECT COUNT(id)
+        FROM t_member
+        WHERE MONTH(regTime) = MONTH(NOW());
+    </select>
+    <select id="countByRegtimeBetween" resultType="int">
+select count(*)
+ from t_member
+where
+regTime between #{beginRegtime,jdbcType=TIMESTAMP} and #{endRegtime,jdbcType=TIMESTAMP}
+</select>
+    <select id="selectByCondition" resultType="com.dh.pojo.Member">
+        SELECT * FROM t_member
+        <if test="value != null and value.length > 0">
+            WHERE fileNumber LIKE CONCAT('%', #{value}, '%')
+            OR phoneNumber LIKE CONCAT('%', #{value}, '%')
+            OR name LIKE CONCAT('%', #{value}, '%')
+        </if>
+    </select>
+</mapper>

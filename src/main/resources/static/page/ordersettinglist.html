@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- 页面meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>传智健康</title>
+    <meta name="description" content="传智健康">
+    <meta name="keywords" content="传智健康">
+    <meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" name="viewport">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="../plugins/elementui/index.css">
+    <link rel="stylesheet" href="../plugins/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="hold-transition">
+<div id="app">
+    <div class="content-header">
+        <h1>预约管理
+            <small>预约列表</small>
+        </h1>
+        <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
+            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+            <el-breadcrumb-item>预约管理</el-breadcrumb-item>
+            <el-breadcrumb-item>预约列表</el-breadcrumb-item>
+        </el-breadcrumb>
+    </div>
+    <div class="app-container">
+        <div class="box">
+            <div class="filter-container">
+                <el-input placeholder="档案号/姓名/手机号" v-model="pagination.queryString" style="width: 200px;"
+                          class="filter-item"></el-input>
+                <el-button @click="findPage()" class="dalfBut">查询</el-button>
+                <el-button type="warning" @click="reset()" class="dalfBut">重置</el-button>
+                <el-button type="primary" class="butT" @click="handleCreate()">新增</el-button>
+            </div>
+            <el-table size="small" current-row-key="id" :data="dataList" stripe highlight-current-row>
+                <el-table-column type="index" align="center" label="序号"></el-table-column>
+                <el-table-column label="性名" align="center">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.memberId == 93 ? '丁昊' :  'test'}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="到诊情况" align=s"center">
+                    <template slot-scope="scope">
+                        <span>{{  scope.row.orderstatus}}</span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column label="套餐名称" align="center">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.setmealId == '12' ? '入职无忧体检套餐（男女通用）' : scope.row.sex == '13' ? '粉红珍爱(女)升级TM12项筛查体检套餐' : scope.row.sex == '14' ? '阳光爸妈升级肿瘤12项筛查（男女单人）体检套餐':'珍爱高端升级肿瘤12项筛查（男女单人）'}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="orderdate" label="预约体检时间" align="center"></el-table-column>
+
+                <el-table-column label="操作" align="center">
+                    <template slot-scope="scope">
+                        <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">已到诊</el-button>
+                        <el-button type="danger" size="mini" @click="f1(scope.row)">未到诊</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="pagination-container">
+                <el-pagination
+                        class="pagiantion"
+                        @current-change="handleCurrentChange"
+                        :current-page="pagination.currentPage"
+                        :page-size="pagination.pageSize"
+                        layout="total, prev, pager, next, jumper"
+                        :total="pagination.total">
+                </el-pagination>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<!-- 引入组件库 -->
+<script src="../js/vue.js"></script>
+<script src="../plugins/elementui/index.js"></script>
+<script type="text/javascript" src="../js/jquery.min.js"></script>
+<script src="../js/axios-0.18.0.js"></script>
+<script>
+    var vue = new Vue({
+        el: '#app',
+        data: {
+            activeName: 'first',//添加/编辑窗口Tab标签名称
+            pagination: {//分页相关模型数据
+                currentPage: 1,//当前页码
+                pageSize: 10,//每页显示的记录数
+                total: 100,//总记录数
+                queryString: null//查询条件
+            },
+            dataList: [],//当前页要展示的分页列表数据
+            formData: {},//表单数据
+            dialogFormVisible: false,//增加表单是否可见
+            dialogFormVisible4Edit: false,//编辑表单是否可见
+        },
+        //钩子函数，VUE对象初始化完成后自动执行
+        created() {
+            this.findPage();
+        },
+        methods: {
+            //编辑
+            handleEdit() {
+                //表单校验
+                //表单校验通过，可以提交数据
+                axios.post("/member/edit",this.formData).then((res) => {
+                    if (res.data.flag) {
+                        //弹出成功提示消息
+                        this.$message({
+                            type: 'success',
+                            message: res.data.message
+                        });
+                    } else {
+                        //执行失败
+                        this.$message.error(res.data.message);
+                    }
+                }).finally(() => {
+                    //隐藏编辑窗口
+                    this.dialogFormVisible4Edit = false;
+                    //调用分页查询功能
+                    this.findPage();
+                })
+            },f1(row){
+                axios.get("/orderlist/changeStatus1?id=" + row.id).then((res) => {
+                    if (res.data.flag) {
+                        //进行回显，给予vue的数据绑定实现
+                        this.formData = res.data.data;
+                        this.findPage();
+                        this.$message({
+                            message: res.data.message,
+                            type: 'error'
+                        });
+                    } else {
+                        //查询失败，弹出提示
+                        this.$message.error(res.data.message);
+                    }
+                });
+            },
+            //添加
+            handleAdd() {
+                //进行表单校验
+                this.$refs['dataAddForm'].validate((valid) => {
+                    if (valid) {
+                        //表单校验通过，发送ajax请求，将录入的数据提交到后台进行处理
+                        axios.post("/member/add",this.formData).then((res) => {
+                            //关闭新增窗口
+                            this.dialogFormVisible = false;
+                            if (res.data.flag) {
+                                //新增成功后，重新调用分页查询方法，查询出最新数据
+                                this.findPage();
+                                //弹出提示信息
+                                this.$message({
+                                    message: res.data.message,
+                                    type: 'success'
+                                });
+                            } else {
+                                //执行失败
+                                //弹出提示
+                                this.$message.error(res.data.message);
+                            }
+                        });
+                    } else { //校验不通过
+                        this.$message.error("数据校验失败，请检查你的输入信息是否正确");
+                        return false;
+                    }
+                });
+            },
+            //分页查询
+            findPage() {
+                //发送ajax请求，提交分页相关请求参数
+                var param = {
+                    currentPage: this.pagination.currentPage,
+                    pageSize: this.pagination.pageSize,
+                    queryString: this.pagination.queryString
+                };
+                axios.post("/orderlist/findPage", param).then((res) => {
+                    //解析Controller响应回的数据，为模型数据赋值
+                    this.pagination.total = res.data.total;
+                    this.dataList = res.data.rows;
+                    console.log(this.dataList);
+                });
+            },
+            // 重置表单
+            resetForm() {
+                //重置数据
+                this.formData = {};
+            },
+            // 弹出添加窗口
+            handleCreate() {
+                axios.get("/orderlist/changeStatus1?id=" + row.id).then((res) => {
+                    if (res.data.flag) {
+                        //进行回显，给予vue的数据绑定实现
+                        this.formData = res.data.data;
+                        this.findPage();
+                        this.$message({
+                            message: res.data.message,
+                        });
+                    } else {
+                        //查询失败，弹出提示
+                        this.$message.error(res.data.message);
+                    }
+                });
+            },
+            //重置查询结果
+            reset() {
+                this.pagination.queryString = null;
+                this.pagination.currentPage = 1;
+                this.findPage();
+            },
+            // 弹出编辑窗口
+            handleUpdate(row) {
+                axios.get("/orderlist/changeStatus?id=" + row.id).then((res) => {
+                    if (res.data.flag) {
+                        //进行回显，给予vue的数据绑定实现
+                        this.formData = res.data.data;
+                        this.findPage();
+                        this.$message({
+                            message: res.data.message,
+                            type: 'success'
+                        });
+                    } else {
+                        //查询失败，弹出提示
+                        this.$message.error(res.data.message);
+                    }
+                });
+
+            },
+            //切换页码
+            handleCurrentChange(currentPage) {
+                this.pagination.currentPage = currentPage;
+                this.findPage();
+            },
+            getAge(birthday) {
+                if (birthday!=null) {
+                    const now = new Date();
+                    const birthDate = new Date(birthday);
+                    let age = now.getFullYear() - birthDate.getFullYear();
+                    const monthDiff = now.getMonth() - birthDate.getMonth();
+                    if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birthDate.getDate())) {
+                        age--;
+                    }
+                    return age;
+                }
+                return "未知"
+            },
+            // 删除
+            handleDelete(row) {//row是一个json对象
+                this.$confirm("确定要删除当前数据吗", "提示", {type: 'warning'})
+                    .then(() => {
+                        //   用户点击了 确定 按钮 ,发送ajax请求 ，将检查项ID提交到controller进行处理
+                        axios.get("/member/delete?id=" + row.id).then((res) => {
+                            if (res.data.flag) {
+                                //执行成功   弹出提示信息
+                                this.$message({
+                                    type: 'success',
+                                    message: res.data.message
+                                });
+
+                            } else {
+                                //执行失败
+                                this.$message.error(res.data.message);
+                            }
+                            //重新进行分页查询
+                            this.findPage();
+                        });
+                    }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '操作已取消'
+                    });
+                });
+            }
+        }
+    })
+</script>
+</html>

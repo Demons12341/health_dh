@@ -1,0 +1,37 @@
+mybatis-plus:
+    configuration:
+        log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+        map-underscore-to-camel-case: true
+    mapper-locations: classpath:mapper/**
+server:
+    port: 9090
+spring:
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        password: dh746374
+        url: jdbc:mysql://localhost:3306/health?useUnicode=true&characterEncoding=utf8
+        username: root
+
+    main:
+        allow-circular-references: true
+        allow-bean-definition-overriding: true
+    redis:
+        database: 0
+        host: 127.0.0.1
+        jedis:
+            pool:
+                max-active: 100
+                max-idle: 20
+        port: 6379
+        timeout: 30000
+    servlet:
+        multipart:
+            enabled: true
+            max-file-size: 2000MB
+            max-request-size: 2000MB
+
+    freemarker:
+        template-loader-path: classpath:/ftl/
+        suffix: .ftl
+        charset: UTF-8
+        out_put_path: D:/Desktop/code/health_dh/health_mobile/src/main/resources/static/pages

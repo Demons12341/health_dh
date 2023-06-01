@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dh.mapper.PermissionMapper">
+
+    <resultMap id="BaseResultMap" type="com.dh.pojo.Permission">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="keyword" column="keyword" jdbcType="VARCHAR"/>
+            <result property="description" column="description" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name,keyword,
+        description
+    </sql>
+    <select id="findByRoleId"  parameterType="int" resultType="com.dh.pojo.Permission">
+          select  p.*
+      		from t_permission p ,t_role_permission rp
+      		where p.id = rp.permission_id and rp.role_id = #{roleId}
+    </select>
+</mapper>

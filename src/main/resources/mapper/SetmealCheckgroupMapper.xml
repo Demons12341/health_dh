@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dh.mapper.SetmealCheckgroupMapper">
+
+    <resultMap id="BaseResultMap" type="com.dh.pojo.SetmealCheckgroup">
+            <id property="setmealId" column="setmeal_id" jdbcType="INTEGER"/>
+            <id property="checkgroupId" column="checkgroup_id" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        setmeal_id,checkgroup_id
+    </sql>
+    <select id="selectAllBySetmealId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_setmeal_checkgroup
+        where
+        setmeal_id = #{setmealId,jdbcType=NUMERIC}
+    </select>
+    <delete id="deleteBySetmealId">
+delete from t_setmeal_checkgroup
+where
+setmeal_id = #{setmealId,jdbcType=NUMERIC}
+</delete>
+    <select id="selectCheckgroupIdBySetmealId" resultMap="BaseResultMap">
+select checkgroup_id
+from t_setmeal_checkgroup
+where
+setmeal_id = #{setmealId,jdbcType=NUMERIC}
+</select>
+    <select id="selectCheckgroupIdBySetmealId" resultMap="BaseResultMap">
+select checkgroup_id
+from t_setmeal_checkgroup
+where
+setmeal_id = #{setmealId,jdbcType=NUMERIC}
+</select>
+</mapper>

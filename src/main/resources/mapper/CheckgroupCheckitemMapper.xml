@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dh.mapper.CheckgroupCheckitemMapper">
+
+    <resultMap id="BaseResultMap" type="com.dh.pojo.CheckgroupCheckitem">
+            <id property="checkgroupId" column="checkgroup_id" jdbcType="INTEGER"/>
+            <id property="checkitemId" column="checkitem_id" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        checkgroup_id,checkitem_id
+    </sql>
+
+    <delete id="deleteByCheckgroupId">
+            delete from t_checkgroup_checkitem
+            where
+            checkgroup_id = #{checkgroupId,jdbcType=NUMERIC}
+</delete>
+
+    <select id="selectAllByCheckgroupId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_checkgroup_checkitem
+        where
+        checkgroup_id = #{checkgroupId,jdbcType=NUMERIC}
+    </select>
+</mapper>
